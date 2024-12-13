@@ -1,5 +1,6 @@
 // app/layout.tsx
 import React from 'react';
+import 'tailwindcss/tailwind.css';
 
 export const metadata = {
   title: 'CRUD App',

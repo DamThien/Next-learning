@@ -1,108 +1,66 @@
-// components/PostForm.tsx
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import Button from './Button'
 
 interface PostFormProps {
-  onSubmit: (data: { title: string; image: string | null; content: string }) => void;
-  initialData?: { title: string; image: string | null; content: string };
-  buttonText: string;
+  onSubmit: (data: { title: string; content: string; image: string | null }) => void
+  initialData: { title: string; content: string; image: string | null }
+  buttonText: string
 }
 
 const PostForm: React.FC<PostFormProps> = ({ onSubmit, initialData, buttonText }) => {
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [image, setImage] = useState(initialData?.image || '');
-  const [content, setContent] = useState(initialData?.content || '');
+  const [title, setTitle] = useState(initialData.title)
+  const [content, setContent] = useState(initialData.content)
+  const [image, setImage] = useState<string | null>(initialData.image)
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({ title, image: image || null, content });
-  };
+    e.preventDefault()
+    onSubmit({ title, content, image })
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="post-form">
-      <div className="form-group">
-        <label htmlFor="title">Tiêu đề:</label>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          Title
+        </label>
         <input
-          id="title"
           type="text"
-          placeholder="Title"
+          id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
           required
         />
       </div>
-
-      <div className="form-group">
-        <label htmlFor="image">Link ảnh:</label>
-        <input
-          id="image"
-          type="text"
-          placeholder="Image link (optional)"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="content">Nội dung:</label>
+      <div>
+        <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+          Content
+        </label>
         <textarea
           id="content"
-          placeholder="Content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+          rows={4}
           required
         />
       </div>
-
-      <button type="submit" className="submit-button">
-        {buttonText}
-      </button>
-
-      <style jsx>{`
-        .post-form {
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .form-group label {
-          margin-bottom: 5px;
-          font-weight: bold;
-        }
-
-        input,
-        textarea {
-          padding: 10px;
-          font-size: 14px;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-        }
-
-        textarea {
-          resize: vertical;
-          min-height: 100px;
-        }
-
-        .submit-button {
-          background-color: #0070f3;
-          color: white;
-          padding: 10px;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 16px;
-        }
-
-        .submit-button:hover {
-          background-color: #005bb5;
-        }
-      `}</style>
+      <div>
+        <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+          Image URL
+        </label>
+        <input
+          type="text"
+          id="image"
+          value={image || ''}
+          onChange={(e) => setImage(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+        />
+      </div>
+      <Button type="submit">{buttonText}</Button>
     </form>
-  );
-};
+  )
+}
 
-export default PostForm;
+export default PostForm
+
