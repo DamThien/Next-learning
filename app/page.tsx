@@ -3,18 +3,21 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Link from 'next/link';
+import Modal from '@/components/Modal';
+import PostForm from '@/components/postForm';
 import Image from 'next/image';
 
 interface Post {
   id: number;
   title: string;
-  image: string|null;
+  image: string | null;
   content: string;
 }
 
 const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPost, setCurrentPost] = useState<Post | null>(null);
 
   useEffect(() => {
     axios.get('http://localhost:4000/posts').then((response) => setPosts(response.data));
@@ -26,19 +29,54 @@ const Home = () => {
     });
   };
 
+  const openCreateModal = () => {
+    setCurrentPost(null);
+    setIsModalOpen(false); 
+    setTimeout(() => setIsModalOpen(true), 0);
+  };
+  
+  const openEditModal = (post: Post) => {
+    setCurrentPost(post);
+    setIsModalOpen(false);
+    setTimeout(() => setIsModalOpen(true), 0);
+  };
+
+  const handleFormSubmit = (data: { title: string; content: string }) => {
+    if (currentPost) {
+      axios.put(`http://localhost:4000/posts/${currentPost.id}`, data).then((response) => {
+        setPosts(posts.map((post) => (post.id === currentPost.id ? response.data : post)));
+        setIsModalOpen(false);
+      });
+    } else {
+      axios.post('http://localhost:4000/posts', data).then((response) => {
+        setPosts([...posts, response.data]);
+        setIsModalOpen(false);
+      });
+    }
+  };
+
   return (
     <div>
       <h1>Danh sách bài viết</h1>
-      <Link href="/create">Tạo bài viết mới</Link>
+      <button onClick={openCreateModal}>Tạo bài viết mới</button>
       {posts.map((post) => (
         <div key={post.id}>
           <h2>{post.title}</h2>
           <p>{post.content}</p>
           {post?.image === null ? "" : <Image src={post.image} alt={post.title} width={300} height={200} />}
-          <Link href={`/edit/${post.id}`}>Chỉnh sửa</Link>
+          <button onClick={() => openEditModal(post)}>Chỉnh sửa</button>
           <button onClick={() => handleDelete(post.id)}>Xóa</button>
         </div>
       ))}
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <h2>{currentPost ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}</h2>
+        <PostForm
+          onSubmit={handleFormSubmit}
+          initialData={currentPost || { title: '', content: '', image: null }}
+          buttonText={currentPost ? 'Cập nhật' : 'Tạo'}
+        />
+      </Modal>
     </div>
   );
 };
